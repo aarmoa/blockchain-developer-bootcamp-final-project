@@ -6,7 +6,7 @@ The idea of the project is to create a contract that allows different users to c
 Any address could be used as the recipient of more than one payment at the same time, from the same paying address or from different paying addresses.
 The possibility to implement the automation of the payment transfer when the time is reached will be evaluated, but it will deppend on the possibility to configure a temporal event to trigger the execution. Also since the number of addresses to receive payments could be high, it might not be feasible (from the point of view of the gas limit per transaction) to automate the payment.
 
-*** Use Cases
+### Use Cases
 * A user can register a number of payments to be done in a particular date. A payment is defined by:
   * Payment amount
   * Destination address
@@ -17,5 +17,5 @@ The possibility to implement the automation of the payment transfer when the tim
 * A user can check the amount to be received as payment.
 * A user can check the amoutn to be received as payment from a particular paying address.
 
-*** User Cases to Investigate
+### User Cases to Investigate
 * Create a time trigger to automate the transfer of all payments configured for a particular date.
