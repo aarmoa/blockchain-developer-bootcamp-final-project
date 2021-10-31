@@ -17,5 +17,5 @@ The possibility to implement the automation of the payment transfer when the tim
 * A user can check the amount to be received as payment.
 * A user can check the amoutn to be received as payment from a particular paying address.
 
-### User Cases to Investigate
+### Use Cases to Investigate
 * Create a time trigger to automate the transfer of all payments configured for a particular date.
