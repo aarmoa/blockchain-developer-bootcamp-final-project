@@ -1,0 +1,29 @@
+{
+  "name": "programmable_payments",
+  "version": "1.0.0",
+  "description": "EVM compatible contract to program payments",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.2",
+    "ganache-time-traveler": "^1.0.16"
+  },
+  "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.15"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aarmoa/blockchain-developer-bootcamp-final-project.git"
+  },
+  "author": "Abel Armoa",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/aarmoa/blockchain-developer-bootcamp-final-project/issues"
+  },
+  "homepage": "https://github.com/aarmoa/blockchain-developer-bootcamp-final-project#readme"
+}
