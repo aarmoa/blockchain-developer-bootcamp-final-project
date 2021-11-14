@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.3;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 struct Payment {
     uint id;
@@ -21,12 +23,24 @@ library Array {
     }
 }
 
-contract ProgrammablePayment is Ownable, Pausable {
+contract ProgrammablePayment is Initializable, UUPSUpgradeable, OwnableUpgradeable, PausableUpgradeable {
     using Array for Payment[];
 
     uint256 private idCounter;
     mapping (address => Payment[]) private payersCommitments;
     mapping (address => Payment[]) private receiversPayments;
+
+    function initialize() initializer public {
+        __UUPSUpgradeable_init();
+        __Ownable_init();
+        __Pausable_init();
+    }
+
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        onlyOwner
+        override
+    {}
 
     /* 
      * Events
