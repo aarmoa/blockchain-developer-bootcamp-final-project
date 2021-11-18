@@ -9,9 +9,12 @@ const {
 
 contract("ProgrammablePayment", accounts => {
     const [owner, payer1, payer2, receiver1, receiver2] = accounts;
+    var instance;
 
     beforeEach(async() => {
         timeSnapshot = await snapshot();
+        instance = await ProgrammablePayment.new({from: owner});
+        await instance.initialize({from: owner});
     });
  
     afterEach(async() => {
@@ -19,13 +22,11 @@ contract("ProgrammablePayment", accounts => {
     });
 
     it("Owner registered when contract is created", async () => {
-        var instance = await ProgrammablePayment.new({from: owner});
         var instanceOwner = await instance.owner();
         assert.equal(instanceOwner, owner, "The contract owner was not registered during construction");
     });
 
     it("Ownership can be transfered", async () => {
-        var instance = await ProgrammablePayment.new({from: owner});
         var txReceipt = await instance.transferOwnership(payer2, {from: owner});
         var instanceOwner = await instance.owner();
         assert.equal(instanceOwner, payer2, "The contract did not transfer the ownership correctly");
@@ -34,19 +35,15 @@ contract("ProgrammablePayment", accounts => {
     });
 
     it("Only the contract owner can pause it", async () => {
-        var instance = await ProgrammablePayment.new({from: owner});
-
         await expectRevert(instance.pause({from: payer1}), "Ownable: caller is not the owner")
     });
 
     it("Only the contract owner can unpause it", async () => {
-        var instance = await ProgrammablePayment.new({from: owner});
         await instance.pause({from: owner});
         await expectRevert(instance.unpause({from: payer1}), "Ownable: caller is not the owner")
     });
 
     it("Payer can commit one payment", async () => {
-        var instance = await ProgrammablePayment.new();
         var destination = receiver1;
         var lockTimestamp = 1000;
         var paymentAmount = 5000;
@@ -68,7 +65,6 @@ contract("ProgrammablePayment", accounts => {
     });
 
     it("An event is generated when a payment is committed" , async () => {
-        var instance = await ProgrammablePayment.new();
         var lockTimestamp = 1000;
         var paymentAmount = 5000;
         var txReceipt = await instance.commitPayment(receiver1, lockTimestamp, {from: payer1, value: paymentAmount});
@@ -77,7 +73,6 @@ contract("ProgrammablePayment", accounts => {
     });
 
     it("Can't commit a payment when the contract is paused", async () => {
-        var instance = await ProgrammablePayment.new({from: owner});
         var destination = receiver1;
         var lockTimestamp = 1000;
         var paymentAmount = 5000;
@@ -90,7 +85,6 @@ contract("ProgrammablePayment", accounts => {
 
     it("Receiver can claim unlocked payment", async () => {
         var currentTime = await time.latest();
-        var instance = await ProgrammablePayment.new();
         var destination = receiver1;
         var lockTimestamp = currentTime.add(time.duration.days(1));
         var paymentAmount = 1000000;
@@ -109,7 +103,6 @@ contract("ProgrammablePayment", accounts => {
 
     it("Receiver can't claim locked payment", async () => {
         var currentTime = await time.latest();
-        var instance = await ProgrammablePayment.new();
         var destination = receiver1;
         var lockTimestamp = currentTime.add(time.duration.days(3));
         var paymentAmount = 1000000;
@@ -126,7 +119,6 @@ contract("ProgrammablePayment", accounts => {
 
     it("Receiver can't claim unlocked twice", async () => {
         var currentTime = await time.latest();
-        var instance = await ProgrammablePayment.new();
         var destination = receiver1;
         var lockTimestamp = currentTime.add(time.duration.days(1));
         var paymentAmount = 1000000;
@@ -146,7 +138,6 @@ contract("ProgrammablePayment", accounts => {
 
     it("Receiver can't claim a payment if the contract is paused", async () => {
         var currentTime = await time.latest();
-        var instance = await ProgrammablePayment.new({from: owner});
         var destination = receiver1;
         var lockTimestamp = currentTime.add(time.duration.days(1));
         var paymentAmount = 1000000;
@@ -160,7 +151,6 @@ contract("ProgrammablePayment", accounts => {
     
     it("An event is logged when a payment is claimed", async () => {
         var currentTime = await time.latest();
-        var instance = await ProgrammablePayment.new();
         var destination = receiver1;
         var lockTimestamp = currentTime.add(time.duration.days(1));
         var paymentAmount = 1000000;
@@ -173,6 +163,3 @@ contract("ProgrammablePayment", accounts => {
         
     });
 });
-
-// https://medium.com/sablier/writing-accurate-time-dependent-truffle-tests-8febc827acb5
-// https://medium.com/fluidity/standing-the-time-of-test-b906fcc374a9

@@ -1,5 +1,4 @@
 const { deployProxy, upgradeProxy} = require('@openzeppelin/truffle-upgrades');
-const { assert } = require('console');
 
  
 // Load compiled artifacts
