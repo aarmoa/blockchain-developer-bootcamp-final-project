@@ -47,12 +47,18 @@ contract ProgrammablePayment is Initializable, UUPSUpgradeable, OwnableUpgradeab
     */
     event LogPaymentCommitted(address indexed payer, address indexed receiver, uint indexed lockTime, uint amount);
     event LogPaymentClaimed(address indexed receiver, address indexed payer, uint indexed lockTime, uint amount);
+    event LogPaymentCancelled(address indexed payer, address indexed receiver, uint indexed lockTime, uint amount);
 
     /*
     * Modifiers
     */
     modifier checkReceiverNotPayer(address _receiver) {
         require (msg.sender != _receiver, "The payer address cannot be the receiving address");
+        _;
+    }
+
+    modifier checkCancellationTime(uint _unlockTimestamp) {
+        require (_unlockTimestamp - 1 days > block.timestamp, "The payment can't be cancelled");
         _;
     }
 
@@ -74,27 +80,32 @@ contract ProgrammablePayment is Initializable, UUPSUpgradeable, OwnableUpgradeab
         emit LogPaymentCommitted(payer, receiver, unlockTime, amount);
     }
 
-    function committedPayments() public view 
-        returns (
-            uint[] memory, 
-            address[] memory, 
-            uint[] memory, 
-            uint[] memory) 
-        {
-            Payment[] storage payments = payersCommitments[msg.sender];
-            uint[] memory ids = new uint[](payments.length);
-            address[] memory receivers = new address[](payments.length);
-            uint[] memory timestamps = new uint[](payments.length);
-            uint[] memory amounts = new uint[](payments.length);
-            for (uint index = 0; index < payments.length; index++) {
+    function cancelCommittedPayment(address receiver, uint unlockTime, uint amount) 
+        public 
+        whenNotPaused
+        checkCancellationTime(unlockTime) {
+            Payment[] storage payments = receiversPayments[receiver];
+            uint committedPaymentIndex;
+            Payment memory paymentToCancel;
+        
+            for(uint index = 0; index < payments.length; index++) {
                 Payment memory payment = payments[index];
-                ids[index] = payment.id;
-                receivers[index] = payment.receiver;
-                timestamps[index] = payment.unlockTimestamp;
-                amounts[index] = payment.amount;
+                if (payment.payer == msg.sender &&
+                    payment.unlockTimestamp == unlockTime &&
+                    payment.amount == amount) {
+                        committedPaymentIndex = index;
+                        paymentToCancel = payment;
+                        break;
+                }
             }
-            return(ids, receivers, timestamps, amounts);
-        }
+
+            require(paymentToCancel.receiver != address(0), "Payment to cancel not found");
+            payments.remove(committedPaymentIndex);
+
+            (bool sent, ) = msg.sender.call{value: paymentToCancel.amount}("");
+            require(sent, "Failed to send Ether");
+            emit LogPaymentCancelled(paymentToCancel.payer, paymentToCancel.receiver, paymentToCancel.unlockTimestamp, paymentToCancel.amount);
+    }
 
     function claimAvailablePayments() public whenNotPaused {
         Payment[] storage payments = receiversPayments[msg.sender];

@@ -15,7 +15,7 @@ The possibility to implement the automation of the payment transfer when the tim
 * A user that has been payed using the contract can request to receive the founds of all the payments that are available (the payment date has been reached).
 * A user that has configured a payment to be done can request its cancellation until one day before the payment date.
 * A user can check the amount to be received as payment.
-* A user can check the amoutn to be received as payment from a particular paying address.
+* A user can check the amount to be received as payment from a particular paying address.
 
 ### Use Cases to Investigate
 * Create a time trigger to automate the transfer of all payments configured for a particular date.

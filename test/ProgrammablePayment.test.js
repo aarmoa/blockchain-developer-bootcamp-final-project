@@ -47,27 +47,10 @@ contract("ProgrammablePayment", accounts => {
         var destination = receiver1;
         var lockTimestamp = 1000;
         var paymentAmount = 5000;
-        await instance.commitPayment(destination, lockTimestamp, {from: payer1, value: paymentAmount});
+        var txReceipt = await instance.commitPayment(destination, lockTimestamp, {from: payer1, value: paymentAmount});
 
         var contractBalanceAfterCommit = await web3.eth.getBalance(instance.address);
         assert.equal(Number(contractBalanceAfterCommit), paymentAmount, "The contract address did not receive the founds for the payment");
-
-        var payer1_payments_info = await instance.committedPayments({from: payer1});
-        assert.lengthOf(payer1_payments_info[0], 1, "Payer 1 should have commited only 1 payment");
-        var ids = payer1_payments_info[0];
-        var receivers = payer1_payments_info[1];
-        var timestamps = payer1_payments_info[2];
-        var amounts = payer1_payments_info[3];
-        assert.equal(ids[0].toNumber(), 0, "Payment id should be 0");
-        assert.equal(receivers[0], destination, "Payment receivers is incorrect");
-        assert.equal(timestamps[0].toNumber(), lockTimestamp, "Payment lock timestamp is incorrect");
-        assert.equal(amounts[0].toNumber(), paymentAmount, "Payment amount is incorrect");
-    });
-
-    it("An event is generated when a payment is committed" , async () => {
-        var lockTimestamp = 1000;
-        var paymentAmount = 5000;
-        var txReceipt = await instance.commitPayment(receiver1, lockTimestamp, {from: payer1, value: paymentAmount});
 
         expectEvent(txReceipt, 'LogPaymentCommitted', { payer: payer1, receiver: receiver1, lockTime: new BN(1000), amount: new BN(5000)});
     });
@@ -171,5 +154,76 @@ contract("ProgrammablePayment", accounts => {
         var txReceipt = await instance.claimAvailablePayments({from: receiver1});
         expectEvent(txReceipt, 'LogPaymentClaimed', { receiver: receiver1, payer: payer1, lockTime: lockTimestamp, amount: new BN(paymentAmount)});
         
+    });
+
+    it("Payer can cancel payment", async () => {
+        var currentTime = await time.latest();
+        var destination = receiver1;
+        var lockTimestamp = currentTime.add(time.duration.days(2));
+        var paymentAmount = 1000000;
+        await instance.commitPayment(destination, lockTimestamp, {from: payer1, value: paymentAmount});
+
+        var contractBalance = await web3.eth.getBalance(instance.address);
+        assert.equal(paymentAmount, contractBalance, "Payment commitment failed");
+        
+        var initialBalance = await web3.eth.getBalance(payer1);
+        var txInfo = await instance.cancelCommittedPayment(destination, lockTimestamp, paymentAmount, {from: payer1});
+        var tx = await web3.eth.getTransaction(txInfo.tx);
+        var gasCost = tx.gasPrice * txInfo.receipt.gasUsed;
+        var newBalance = await web3.eth.getBalance(payer1);
+        assert.equal(newBalance, initialBalance - gasCost + paymentAmount, "Account payer1 should have received the amount of the cancelled payment");
+
+        contractBalance = await web3.eth.getBalance(instance.address);
+        assert.equal(0, contractBalance, "Payment cancellation failed");
+    });
+
+    it("Payer can't cancel a payment if the contract is paused", async () => {
+        var currentTime = await time.latest();
+        var destination = receiver1;
+        var lockTimestamp = currentTime.add(time.duration.days(2));
+        var paymentAmount = 1000000;
+        await instance.commitPayment(destination, lockTimestamp, {from: payer1, value: paymentAmount});
+        await instance.pause({from: owner});
+        
+        await expectRevert(instance.cancelCommittedPayment(destination, lockTimestamp, paymentAmount, {from: payer1}), "Pausable: paused");
+    });
+
+    it("Payer can't cancel a payment to be unlocked in less than 24 hours", async () => {
+        var currentTime = await time.latest();
+        var destination = receiver1;
+        var lockTimestamp = currentTime.add(time.duration.hours(2));
+        var paymentAmount = 1000000;
+        await instance.commitPayment(destination, lockTimestamp, {from: payer1, value: paymentAmount});
+        
+        await expectRevert(instance.cancelCommittedPayment(destination, lockTimestamp, paymentAmount, {from: payer1}), "The payment can't be cancelled");
+    });
+
+    it("Receiver can't claim cancelled payment", async () => {
+        var currentTime = await time.latest();
+        var destination = receiver1;
+        var lockTimestamp = currentTime.add(time.duration.days(2));
+        var paymentAmount = 1000000;
+        
+        await instance.commitPayment(destination, lockTimestamp, {from: payer1, value: paymentAmount});
+        await instance.cancelCommittedPayment(destination, lockTimestamp, paymentAmount, {from: payer1});
+        
+        await time.increase(time.duration.days(3));
+
+        await expectRevert(
+            instance.claimAvailablePayments({from: receiver1}),
+            "No unlocked payments to be claimed");
+
+    });
+
+    it("An event is generated when a payment is cancelled" , async () => {
+        var currentTime = await time.latest();
+        var destination = receiver1;
+        var lockTimestamp = currentTime.add(time.duration.days(2));
+        var paymentAmount = 1000000;
+        
+        instance.commitPayment(destination, lockTimestamp, {from: payer1, value: paymentAmount});
+        var txReceipt = await instance.cancelCommittedPayment(destination, lockTimestamp, paymentAmount, {from: payer1});
+
+        expectEvent(txReceipt, 'LogPaymentCancelled', { payer: payer1, receiver: receiver1, lockTime: lockTimestamp, amount: new BN(1000000)});
     });
 });
