@@ -83,6 +83,16 @@ contract("ProgrammablePayment", accounts => {
             "Pausable: paused");
     })
 
+    it("Payer can't commit a payment to themselves", async () => {
+        var destination = payer1;
+        var lockTimestamp = 1000;
+        var paymentAmount = 5000;
+        
+        await expectRevert(
+            instance.commitPayment(destination, lockTimestamp, {from: payer1, value: paymentAmount}),
+            "The payer address cannot be the receiving address");
+    })
+
     it("Receiver can claim unlocked payment", async () => {
         var currentTime = await time.latest();
         var destination = receiver1;

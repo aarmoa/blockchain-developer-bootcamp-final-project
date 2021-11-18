@@ -48,6 +48,14 @@ contract ProgrammablePayment is Initializable, UUPSUpgradeable, OwnableUpgradeab
     event LogPaymentCommitted(address indexed payer, address indexed receiver, uint indexed lockTime, uint amount);
     event LogPaymentClaimed(address indexed receiver, address indexed payer, uint indexed lockTime, uint amount);
 
+    /*
+    * Modifiers
+    */
+    modifier checkReceiverNotPayer(address _receiver) {
+        require (msg.sender != _receiver, "The payer address cannot be the receiving address");
+        _;
+    }
+
     function pause() public onlyOwner {
         _pause();
     }
@@ -56,7 +64,7 @@ contract ProgrammablePayment is Initializable, UUPSUpgradeable, OwnableUpgradeab
         _unpause();
     }
 
-    function commitPayment(address receiver, uint unlockTime) public payable whenNotPaused {
+    function commitPayment(address receiver, uint unlockTime) public payable whenNotPaused checkReceiverNotPayer(receiver) {
         address payer = msg.sender;
         uint amount = msg.value;
         Payment memory payment = Payment(idCounter, payer, receiver, unlockTime, amount);
