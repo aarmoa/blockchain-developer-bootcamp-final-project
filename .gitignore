@@ -1,2 +1,8 @@
-node_modules
+/node_modules
+**/node_modules
 .openzeppelin
+.env
+**/.env
+yarn.lock
+.vscode
+package-log.json
