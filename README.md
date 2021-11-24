@@ -19,3 +19,7 @@ The possibility to implement the automation of the payment transfer when the tim
 
 ### Use Cases to Investigate
 * Create a time trigger to automate the transfer of all payments configured for a particular date.
+
+### Deployed application for testing
+If you are interested in testing the application without installing or downloading anything, you can use the following address: https://programmablepayment.netlify.app/
+This testing page is connected to an instance of the ProgrammablePayment contract that has been deployed in the Ropsten testnet. You will need to have a Ropsten address with some founds to use the DApp.
