@@ -32,6 +32,69 @@ To download this project and run the unit tests please follow the next steps:
 
 You can find the contracts in the _**contracts**_ folder.
 
+### Running the web application
+The web application has been created using **Scaffold-eth** (https://docs.scaffoldeth.io/scaffold-eth/). If you want to run the DApp locally in your machine you can follow the next steps.
+
+a. Deploy the contracts
+ 1. You need a local node running in your machine. You can also use an application like **Ganache** (https://trufflesuite.com/docs/ganache/overview). In the next steps we consider the node configured to listen using the port 8545. If you are using a different port please make sure to edit the file _truffle-config.js_ in the project's root folder.
+ 2. Execute the command `truffle migrate --network local`
+ 3. Take note of the address the ProgrammablePayment Proxy contract was deployed to. In the next example the deployed addres is _0x2ddC7CaE0c0036E5f414BfFF2A51747FFb8A45c2_
+``` 2_deploy_contracts.js
+=====================
+
+   Deploying 'ProgrammablePayment'
+   -------------------------------
+   > transaction hash:    0x1cd189c311093b2fbad2b1359b39f20b051433e1bbe4418ff7ec3aff659a496f
+   > Blocks: 0            Seconds: 0
+   > contract address:    0x980Ebc8d9c1cF24108b5e233BFAD644D006B6C79
+   > block number:        3
+   > block timestamp:     1637897838
+   > account:             0x02f090cFD08Ef0878608bE2C8a272443D09fc733
+   > balance:             99.93684324
+   > gas used:            2913479 (0x2c74c7)
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.05826958 ETH
+
+
+   Deploying 'ERC1967Proxy'
+   ------------------------
+   > transaction hash:    0x5c4299de8b2ee09a32239b9f281c4e37cfa1afd083445c1fdf6b10d1d8d0a627
+   > Blocks: 0            Seconds: 0
+   > contract address:    0x2ddC7CaE0c0036E5f414BfFF2A51747FFb8A45c2
+   > block number:        4
+   > block timestamp:     1637897839
+   > account:             0x02f090cFD08Ef0878608bE2C8a272443D09fc733
+   > balance:             99.9305506
+   > gas used:            314632 (0x4cd08)
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00629264 ETH
+
+Deployed  0x2ddC7CaE0c0036E5f414BfFF2A51747FFb8A45c2
+```
+b. Start the web application
+ 1. From the terminal go to the **react-app** subfolder
+ 2. Install all dependencies executing `yarn install`
+ 3. Check that the app is configured to use the locally deployed contract by specifying _NETWORKS.localhost_ as the targetNetwork (line 32 in the file _react-app/src/App.jsx_
+```
+const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+```
+ 4. Update the address of the ProgrammablePayment contract for the local network in the file _react-app/src/contracts/hardhat_contracts.json_
+```
+{
+  "1337": {
+    "localhost": {
+      "name": "localhost",
+      "chainId": "1337",
+      "contracts": {
+        "ProgrammablePayment": {
+          "address": "0x2ddC7CaE0c0036E5f414BfFF2A51747FFb8A45c2",
+```
+ 5. Start the local web server with the command `yarn start`
+
+The start script will run the local application server listening in the port 3000. You will need to have a wallet like Metamask installed in your browser, and configure it to use the local network running in the port 8545 (or the correct port if you decided to use a different one).
+
 ### Deployed application for testing
 If you are interested in testing the application without installing or downloading anything, you can use the following address: https://programmablepayment.netlify.app/
 This testing page is connected to an instance of the ProgrammablePayment contract that has been deployed in the Ropsten testnet. You will need to have a Ropsten address with some founds to use the DApp.
