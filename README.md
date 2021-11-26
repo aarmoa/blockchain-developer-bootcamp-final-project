@@ -20,6 +20,18 @@ The possibility to implement the automation of the payment transfer when the tim
 ### Use Cases to Investigate
 * Create a time trigger to automate the transfer of all payments configured for a particular date.
 
+After the investigation I have decided it is not a good idea to have this functionality. For security reasons it is preferrable to let the receivers claim their payments (in transactions initiated by themselves).
+
+### Download the project and run tests
+To download this project and run the unit tests please follow the next steps:
+1. Make sure you have NodeJS installed in your machine.
+2. Clone the repository to a folder in your machine.
+3. Make sure you have **Truffle Suite** installed (see https://trufflesuite.com/docs/truffle/getting-started/installation)
+4. Using a terminal application go the the directory created in the previous step and where the repository has been cloned, and run `yarn install`
+5. To run all solidity tests execute the following command `truffle test`
+
+You can find the contracts in the _**contracts**_ folder.
+
 ### Deployed application for testing
 If you are interested in testing the application without installing or downloading anything, you can use the following address: https://programmablepayment.netlify.app/
 This testing page is connected to an instance of the ProgrammablePayment contract that has been deployed in the Ropsten testnet. You will need to have a Ropsten address with some founds to use the DApp.
