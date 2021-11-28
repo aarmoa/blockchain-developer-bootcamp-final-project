@@ -1,4 +1,4 @@
-# Design Pattersn
+# Design Patterns
 ProgrammablePayment contract uses several of the dessign patterns explained in the course.
 
 ## Inheritance
