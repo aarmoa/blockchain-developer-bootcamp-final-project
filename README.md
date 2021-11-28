@@ -31,12 +31,16 @@ After the investigation I have decided it is not a good idea to have this functi
 
 ### Directory structure
 In the project you will find the following directories.
+
 **contracts**
 Contains the solidity contracts of the project.
+
 **migrations**
 Includes two JS scripts with the instructions to migrate both the Migrations.sol contract and the ProgrammablePayment.sol contract.
+
 **react-app**
 This directory contains all the elements of the web DApp. It is based on schaffold.eth
+
 **test**
 Contains two files with the unit tests for the programmable payments and also for the upgradable contract functionality.
 
