@@ -117,6 +117,43 @@ const targetNetwork = NETWORKS.localhost; // <------- select your target fronten
 
 The start script will run the local application server listening in the port 3000. You will need to have a wallet like Metamask installed in your browser, and configure it to use the local network running in the port 8545 (or the correct port if you decided to use a different one).
 
+## Deploy contracts to testnet/mainnet
+In the case you want to deploy the contracts to testnet/mainnet you will need to provide the required information about the wallet to be used to pay for the transactions and the information to connect to the node that will receive the deploy requests. If you open the file **truffle-config.js** you will find a couple of lines loading the required configuration form the local environment:
+```
+const MNEMONIC = process.env.MNEMONIC
+const ROPSTEN_URL = process.env.ROPSTEN_URL
+const KOVAN_URL = process.env.KOVAN_URL
+const RINKEBY_URL = process.env.RINKEBY_URL
+const MAINNET_URL = process.env.MAINNET_URL
+```
+
+To configure the parameters you need to create a file called `.env` in the root project directory, with the following structure:
+```
+MNEMONIC=<THE WORDS REQUIRED TO GENERATE THE PRIVATE KEYS OF THE WALLET YOU WANT TO USE TO PAY FOR THE DEPLOYMENT TRANSACTION>
+ROPSTEN_URL=https://ropsten.infura.io/v3/<YOUR INFURA ID>
+KOVAN_URL=https://kovan.infura.io/v3/<YOUR INFURA ID>
+RINKEBY_URL=https://rinkeby.infura.io/v3/<YOUR INFURA ID>
+MAINNET_URL=https://mainnet.infura.io/v3/<YOUR INFURA ID>
+```
+In the previous example we are using Infura. You can point to other networks, but you will have to also change the **truffle-config.js** file and add them in the _networks_ configuration section.
+
+## Point the web DApp to testnet/mainnet
+To run the web DApp pointing to a contract deployed in testnet or mainnet it is required to configure the node that will be used for the requests. That can be done by creating a `.env` file in the **react-app** folder with the connection information. For example if the intention is to point to a contract deployed in _ropsten_ and using Infura the required configuration would be:
+```
+REACT_APP_PROVIDER=https://ropsten.infura.io/v3/<YOUR INFURA ID>
+```
+
+Please also remember tu update the contract's address in the file **react-app/src/contracts/hardhat_contracts.json**
+```
+"3": {
+    "ropsten": {
+      "name": "ropsten",
+      "chainId": "3",
+      "contracts": {
+        "ProgrammablePayment": {
+          "address": "0x0f8093cA95499c28A5758fe6A8a24D7f59079cF1",
+```
+
 ### Deployed application for testing
 If you are interested in testing the application without installing or downloading anything, you can use the following address: https://programmablepayment.netlify.app/
 This testing page is connected to an instance of the ProgrammablePayment contract that has been deployed in the Ropsten testnet. You will need to have a Ropsten address with some founds to use the DApp.
