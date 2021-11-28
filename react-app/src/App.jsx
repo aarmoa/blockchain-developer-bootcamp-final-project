@@ -6,11 +6,10 @@ import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
+import { Account, Header, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
 import {
-  useBalance,
   useContractLoader,
   useGasPrice,
   useUserProviderAndSigner,
@@ -29,7 +28,7 @@ import Authereum from "authereum";
 const { ethers } = require("ethers");
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.ropsten; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = false;
