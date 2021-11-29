@@ -161,3 +161,6 @@ This testing page is connected to an instance of the ProgrammablePayment contrac
 ### Demo video
 This is a short video describing the project and showing the implemented functionalities.
 https://drive.google.com/file/d/1rLxkE0xLkbiH1jN1oYCtHpF8Xye0loOM/view
+
+### Address to receive the certificate
+0xEd6bC1fB9CD6a94E0892afEA8d5D2689DE6Be67E
